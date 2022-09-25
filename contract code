@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract My1155Token is ERC1155, Ownable {
+    constructor() ERC1155("") {}
+    mapping (address => bool) public Whitelisted;
+    uint  public NftPrice = 0.2 ether;
+    function Whitelisting(address account) public onlyOwner{
+        require(! Whitelisted[account], "Given address is already whitelisted");
+        Whitelisted[account] = true;
+    }
+
+    function BatchMinting(uint256[] memory Id, uint256[] memory supply, bytes memory data)public payable {   
+        uint PayAmount = Price(Id);
+        require(Whitelisted[msg.sender], "You are not whitelisted!");
+        require(PayAmount <= 1 ether, "You can mint 5 nft only");
+        require(msg.value >= PayAmount, "Not adequate ethers"); 
+        payable(msg.sender).transfer(msg.value);
+        _mintBatch(msg.sender, Id,supply, data);
+    }
+    function Price(uint[] memory _Id) public view returns(uint){
+         uint NoOfToken = 0;
+         for(uint i = 0; i < _Id.length; i++){
+              NoOfToken +=1;
+         }
+         return NoOfToken * NftPrice;   
+ }
+}
