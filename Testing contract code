@@ -1,0 +1,40 @@
+const{expect}=require("chai");
+const { ethers } = require("hardhat");
+describe("Erc20 Contract",function(){
+    let TestContract;
+    let contract;
+    let owner;
+    let addr1;
+    beforeEach(async function(){
+        TestContract=await ethers.getContractFactory("My1155Token");
+        [owner,addr1]=await ethers.getSigners();
+        contract=await TestContract.deploy();
+    });
+    describe("Test contract", function () {
+        it("Should set right owner",async function(){
+        expect(await contract.owner()).to.equal(owner.address);})
+        
+        
+        it("Should set right nft price",async function(){
+        expect(await contract.NftPrice()).to.equal(BigInt(200000000000000000));})
+        
+        
+        it("Should do proper whitelisting",async function(){
+        await contract.Whitelisting(owner.address);
+        await contract.Whitelisting(addr1.address);
+        const a=await contract.Whitelisted(addr1.address);
+        expect(a).to.equal(true);
+        const b=await contract.Whitelisted(owner.address);
+        expect(b).to.equal(true);})
+        
+        
+        it("Should batch mint tokens",async function(){
+        await contract.Whitelisting(owner.address);
+        await contract.BatchMinting([1,2,3,4,5],[10,20,30,40,50],"0x00",{value:ethers.utils.parseEther("1")});
+        expect(await contract.balanceOf(owner.address,1)).to.equal(10);})
+        
+        
+        it("Should set right  price",async function(){
+         expect(await contract.Price([1,2,3,4,5])).to.equal(BigInt(1000000000000000000));})
+    })
+})
