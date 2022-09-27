@@ -1,6 +1,6 @@
 const{expect}=require("chai");
 const { ethers } = require("hardhat");
-describe("Erc20 Contract",function(){
+describe("ErcBatch Contract",function(){
     let TestContract;
     let contract;
     let owner;
